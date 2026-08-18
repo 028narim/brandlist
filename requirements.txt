@@ -1,0 +1,8 @@
+google-search-results
+requests
+beautifulsoup4
+gspread
+google-auth
+python-dotenv
+# Keeps Python 3.13 macOS installations on a prebuilt wheel in this project.
+cryptography<47
