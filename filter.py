@@ -15,6 +15,7 @@ EXCLUDED_DOMAIN_SUFFIXES = (
     "interpark.com",
     "wemakeprice.com",
     "tmon.co.kr",
+    "ssg.com",
     "blogspot.com",
     "tistory.com",
     "brunch.co.kr",

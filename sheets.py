@@ -5,9 +5,21 @@ from __future__ import annotations
 import gspread
 from google.oauth2.service_account import Credentials
 
+from filter import normalized_host
+
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 HEADER = ["브랜드명(판매사이트)", "사이트 링크", "이메일"]
+
+
+def get_existing_domains(*, credentials_path: str, spreadsheet_id: str) -> set[str]:
+    """Return normalized domains already stored in the first worksheet."""
+    credentials = Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
+    client = gspread.authorize(credentials)
+    worksheet = client.open_by_key(spreadsheet_id).get_worksheet(0)
+    if worksheet is None:
+        raise RuntimeError("첫 번째 워크시트를 찾을 수 없습니다.")
+    return {domain for url in worksheet.col_values(2)[1:] if (domain := normalized_host(url))}
 
 
 def append_to_sheet(
