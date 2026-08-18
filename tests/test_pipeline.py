@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from dedupe import deduplicate_by_domain
 from extract import extract_email, extract_site_info
 from filter import filter_results
-from sheets import HEADER, append_to_sheet
+from sheets import HEADER, append_to_sheet, get_existing_domains
 
 
 class FilterAndDedupeTests(unittest.TestCase):
@@ -55,6 +55,17 @@ class ExtractionTests(unittest.TestCase):
 
 
 class SheetTests(unittest.TestCase):
+    @patch("sheets.gspread.authorize")
+    @patch("sheets.Credentials.from_service_account_file")
+    def test_reads_existing_domains_from_site_link_column(self, credentials: Mock, authorize: Mock) -> None:
+        worksheet = Mock()
+        worksheet.col_values.return_value = [HEADER[1], "https://www.example.kr", "not a url"]
+        authorize.return_value.open_by_key.return_value.get_worksheet.return_value = worksheet
+
+        domains = get_existing_domains(credentials_path="credentials.json", spreadsheet_id="sheet-id")
+
+        self.assertEqual(domains, {"example.kr"})
+
     @patch("sheets.gspread.authorize")
     @patch("sheets.Credentials.from_service_account_file")
     def test_adds_header_to_empty_sheet_and_appends_rows(self, credentials: Mock, authorize: Mock) -> None:
